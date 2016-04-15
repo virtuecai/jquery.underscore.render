@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Example</title>
+    <style>
+        .underscore-template {
+            display: none;
+        }
+        table, tr, td,th {
+            border: 1px gray solid;
+        }
+    </style>
+</head>
+<body>
+
+<table>
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>name</th>
+        <th>age</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="underscore-template">
+        <td>{%= $index %}</td>
+        <td>{%= name %}</td>
+        <td>{%= age %}</td>
+    </tr>
+    </tbody>
+</table>
+
+<script src="lib/seajs/2.2.3/sea.min.js"></script>
+
+<script type="text/javascript">
+    seajs.config({
+        base: "./"
+    });
+    seajs.use(['lib/jquery-1.7.2.min', 'lib/underscore.js', 'dist/jquery.undersore.render'], function () {
+        $('tbody').templateRender({data: [{name: '蔡正大', age: 18}, {name: 'lq', age: 20}]});
+    });
+
+</script>
+</body>
+</html>
