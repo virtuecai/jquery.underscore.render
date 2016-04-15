@@ -4,7 +4,7 @@
  * 创 建 人:  Caizhengda
  * 修改时间:  2016-04-15
  */
-define('dist/jquery.undersore.render', function (require, exports, module) {
+define('dist/jquery.underscore.render', function (require, exports, module) {
 
     require('lib/underscore');
 
