@@ -16,18 +16,23 @@
 
 <table>
     <thead>
-    <tr>
+   <!-- <tr>
         <th>#</th>
         <th>name</th>
         <th>age</th>
-    </tr>
+    </tr>-->
     </thead>
     <tbody>
-    <tr class="underscore-template">
-        <td>{%= $index %}</td>
-        <td>{%= name %}</td>
-        <td>{%= age %}</td>
-    </tr>
+        <script class="underscore-template" type="text/html">
+            <tr>
+                <td>{%= $index %}</td>
+                <td>{%= name %}</td>
+                <td>{%= age %}</td>
+                {% _.each(cars, function(a , b, c){ %}
+                <td>{%=a%}</td>
+                {% }); %}
+            </tr>
+        </script>
     </tbody>
 </table>
 
@@ -38,7 +43,10 @@
         base: "./"
     });
     seajs.use(['lib/jquery-1.7.2.min', 'lib/underscore.js', 'dist/jquery.underscore.render'], function () {
-        $('tbody').templateRender({data: [{name: '蔡正大', age: 18}, {name: 'lq', age: 20}]});
+        $('tbody').templateRender({data: [
+            {name: '蔡正大', age: 18, cars: ['car1','car2']},
+            {name: 'lq', age: 20, cars: ['car1','car2', 'car3']}
+        ]});
     });
 
 </script>

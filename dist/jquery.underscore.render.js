@@ -34,7 +34,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
             this.render(element, options);
         };
 
-        TemplateRender.version = '1.0.0';
+        TemplateRender.version = '1.0';
 
         TemplateRender.defaults = {
             //渲染模版的数据, 对象{} 或者 对象数组[{..},{..}]
@@ -43,9 +43,15 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
             // default-src 为 data-src 加载失败后显示的图片
             // data-src='' 最终会 set attr src 中
             enableDefaultImageSrc: false,
+            //自动移除上一次渲染的原始
+            autoRemove: true,
             beforeCallback: function () {
             },
             afterCallback: function () {
+            },
+            //检查到传入 data 数据为空时回调
+            emptyDataCallBack: function () {
+
             }
         };
 
@@ -60,7 +66,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                     _.templateSettings.interpolate.test(templateContent) ||
                     _.templateSettings.escape.test(templateContent)) {
                 } else {
-                    throw "请确定模版语法:( {%=%} {%%} {%-%}) (以 _.templateSettings 为准), 以及容器选择器!";
+                    console.log("请确定模版语法:( {%=%} {%%} {%-%}) (以 _.templateSettings 为准), 以及容器选择器!");
                 }
             },
             /**
@@ -90,7 +96,12 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                 var $container = $(container);
                 var templateContent = $container.data('template');
                 if (!templateContent) {
-                    templateContent = $container.find('.underscore-template').first().prop('outerHTML');
+                    var $repeat = $container.find('.underscore-template').first();
+                    if($repeat.prop('tagName').toLowerCase() == 'script') {
+                        templateContent = $repeat.html();
+                    } else {
+                        templateContent = $repeat.prop('outerHTML');
+                    }
                 }
                 //templateContent 内容转义 防止 js 代码中出现 &gt 等等
                 templateContent = templateContent.replace(new RegExp("&lt;", "g"), '<').replace(new RegExp("&gt;", "g"), '>');
@@ -102,39 +113,33 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
 
                 // 需要进行渲染的 data
                 if (jQuery.type(options.data) != "array" && jQuery.type(options.data) != "object") {
-                    throw "请正确传入需要进行渲染的 options.data !";
+                    throw "options.data  仅支持 Object or Array!";
                 }
+                //数据为空回调
                 if (jQuery.type(options.data) == "array" && options.data.length == 0) {
-                    throw "请正确传入需要进行渲染的 options.data !";
+                   options.emptyDataCallBack && options.emptyDataCallBack($container);
                 }
                 if (jQuery.type(options.data) == "object" && Object.keys(options.data).length == 0) {
-                    throw "请正确传入需要进行渲染的 options.data !";
+                    options.emptyDataCallBack && options.emptyDataCallBack($container);
                 }
+
                 var $el = [];
                 // 兼容 对象 or 数据
                 if (jQuery.type(options.data) === "array") {
                     $.each(options.data, function (idx, item) {
                         item.$index = idx;
                         var $item = $(_.template(templateContent)(item)).data('item', item).removeClass('underscore-template').addClass('underscore-template-rendered');
-                        if (options.enableDefaultImageSrc) {
-                            $item.find('img').each(function () {
-                                var dataSrc = $(this).data('src');
-                                if (dataSrc) $(this).attr('src', dataSrc);
-                            });
-                        }
+                        that.renderDataSrc($item);
                         $el.push($item);
                     });
                 } else if (jQuery.type(options.data) === "object") {
                     var $item = $(_.template(templateContent)(options.data)).data('item', options.data).removeClass('underscore-template').addClass('underscore-template-rendered');
-                    if (options.enableDefaultImageSrc) {
-                        $item.find('img').each(function () {
-                            var dataSrc = $(this).data('src');
-                            if (dataSrc) $(this).attr('src', dataSrc);
-                        });
-                    }
+                    that.renderDataSrc($item);
                     $el.push($item);
                 }
-                $container.find('.underscore-template, .underscore-template-rendered').remove();
+                if(options.autoRemove) {
+                    $container.find('.underscore-template, .underscore-template-rendered').remove();
+                }
                 try {
                     $container.append($el);
                 } catch (e) {
@@ -150,6 +155,16 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                 }
                 //完成后回调
                 options.afterCallback && options.afterCallback($el);
+            },
+            /**
+             * 如果存在 data-src 则将其赋值给 src 属性
+             * @param $items
+             */
+            renderDataSrc: function ($items) {
+                $items.find('img').each(function () {
+                    var dataSrc = $(this).data('src');
+                    if (dataSrc) $(this).attr('src', dataSrc);
+                });
             }
         };
 
