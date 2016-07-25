@@ -29,6 +29,15 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
     }
 
     (function ($) {
+        
+        //页面加载初始定义的模版
+        $('.underscore-template').each(function () {
+            var $this = $(this);
+            var templateContent = $this.prop('outerHTML');
+            //templateContent 内容转义 防止 js 代码中出现 &gt 等等
+            templateContent = templateContent.replace(new RegExp("&lt;", "g"), '<').replace(new RegExp("&gt;", "g"), '>');
+            $this.parent().data('template', templateContent);
+        });
 
         var TemplateRender = function (element, options) {
             this.render(element, options);
