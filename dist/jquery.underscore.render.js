@@ -33,7 +33,12 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
         //页面加载初始定义的模版
         $('.underscore-template').each(function () {
             var $this = $(this);
-            var templateContent = $this.prop('outerHTML');
+            var templateContent;
+            if($this.prop('tagName').toLowerCase() == 'script') {
+                templateContent = $this.html();
+            } else {
+                templateContent = $this.prop('outerHTML');
+            }
             //templateContent 内容转义 防止 js 代码中出现 &gt 等等
             templateContent = templateContent.replace(new RegExp("&lt;", "g"), '<').replace(new RegExp("&gt;", "g"), '>');
             $this.parent().data('template', templateContent);
@@ -52,7 +57,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
             // default-src 为 data-src 加载失败后显示的图片
             // data-src='' 最终会 set attr src 中
             enableDefaultImageSrc: false,
-            //自动移除上一次渲染的原始
+            //自动移除上一次渲染的元素
             autoRemove: true,
             beforeCallback: function () {
             },

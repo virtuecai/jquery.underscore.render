@@ -15,26 +15,47 @@
 <body>
 
 <table>
-    <thead>
-   <!-- <tr>
-        <th>#</th>
-        <th>name</th>
-        <th>age</th>
-    </tr>-->
-    </thead>
-    <tbody>
+    <tbody id="tbody1">
         <script class="underscore-template" type="text/html">
             <tr>
                 <td>{%= $index %}</td>
                 <td>{%= name %}</td>
                 <td>{%= age %}</td>
-                {% _.each(cars, function(a , b, c){ %}
-                <td>{%=a%}</td>
+                {% _.each(cars, function(car , idx, all){ %}
+                <td>{%= car %}</td>
                 {% }); %}
             </tr>
         </script>
     </tbody>
 </table>
+
+<table>
+    <tbody id="tbody2">
+        <tr class="underscore-template">
+            <td>{%= $index %}</td>
+            <td>{%= name %}</td>
+            <td>{%= age %}</td>
+            <td>{%= cars %}</td>
+        </tr>
+    </tbody>
+</table>
+
+<ul id="ul1">
+    <li class="underscore-template">
+        <span>{%= $index %}</span>
+        <span>{%= name %}</span>
+        <span>{%= age %}</span>
+        {% _.each(cars, function(car , idx, all){ %}
+        <span>{%= car %}</span>
+        {% }); %}
+    </li>
+</ul>
+
+<div class="container">
+    <h1 class="underscore-template">
+        <span>hello, {%= name %}, {%= age %}</span>
+    </h1>
+</div>
 
 <script src="lib/seajs/2.2.3/sea.min.js"></script>
 
@@ -43,10 +64,16 @@
         base: "./"
     });
     seajs.use(['lib/jquery-1.7.2.min', 'lib/underscore.js', 'dist/jquery.underscore.render'], function () {
-        $('tbody').templateRender({data: [
+        var userList = [
             {name: '蔡正大', age: 18, cars: ['car1','car2']},
             {name: 'lq', age: 20, cars: ['car1','car2', 'car3']}
-        ]});
+        ];
+        $('#tbody1').templateRender({data: userList});
+        $('#tbody2').templateRender({data: userList});
+        $('#ul1').templateRender({data: userList});
+
+        var user = {name: 'virtuecai', age: 18};
+        $('div.container').templateRender({data: user});
     });
 
 </script>
