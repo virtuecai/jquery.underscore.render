@@ -33,7 +33,7 @@
 
 ```js
 var userList = [
-    {name: '蔡正大', age: 18, cars: ['car1','car2']},
+    {name: 'virtuecai', age: 18, cars: ['car1','car2']},
     {name: 'lq', age: 20, cars: ['car1','car2', 'car3']}
 ];
 $('#tbody1').templateRender({data: userList});
@@ -53,7 +53,7 @@ $('#tbody1').templateRender({data: userList});
 
 ```js
 var userList = [
-    {name: '蔡正大', age: 18},
+    {name: 'virtuecai', age: 18},
     {name: 'lq', age: 20}
 ];
 $('#tbody2').templateRender({data: userList});
