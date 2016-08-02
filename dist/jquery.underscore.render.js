@@ -29,7 +29,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
     }
 
     (function ($) {
-        
+
         //页面加载初始定义的模版
         $('.underscore-template').each(function () {
             var $this = $(this);
@@ -42,6 +42,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
             //templateContent 内容转义 防止 js 代码中出现 &gt 等等
             templateContent = templateContent.replace(new RegExp("&lt;", "g"), '<').replace(new RegExp("&gt;", "g"), '>');
             $this.parent().data('template', templateContent);
+            $this.remove();
         });
 
         var TemplateRender = function (element, options) {
@@ -131,7 +132,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                 }
                 //数据为空回调
                 if (jQuery.type(options.data) == "array" && options.data.length == 0) {
-                   options.emptyDataCallBack && options.emptyDataCallBack($container);
+                    options.emptyDataCallBack && options.emptyDataCallBack($container);
                 }
                 if (jQuery.type(options.data) == "object" && Object.keys(options.data).length == 0) {
                     options.emptyDataCallBack && options.emptyDataCallBack($container);
@@ -176,8 +177,10 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
              */
             renderDataSrc: function ($items) {
                 $items.find('img').each(function () {
-                    var dataSrc = $(this).data('src');
-                    if (dataSrc) $(this).attr('src', dataSrc);
+                    var $this =$(this);
+                    var dataSrc = $this.data('src');
+                    if (dataSrc) $this.attr('src', dataSrc);
+                    $this.removeAttr('data-src');
                 });
             }
         };
@@ -192,7 +195,11 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                 var $this   = $(this);
                 var data    = $this.data('underscore.render');
                 var _options = $.extend({}, TemplateRender.defaults, $this.data(), typeof options == 'object' && options)
-                if (!data) $this.data('underscore.render', (data = new TemplateRender(this, _options)))
+                if (!data) {
+                    $this.data('underscore.render', (data = new TemplateRender(this, _options)))
+                } else {
+                    data.render(this, _options);
+                }
             });
         };
 

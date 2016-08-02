@@ -65,14 +65,14 @@
     });
     seajs.use(['lib/jquery-1.7.2.min', 'lib/underscore.js', 'dist/jquery.underscore.render'], function () {
         var userList = [
-            {name: '蔡正大', age: 18, cars: ['car1','car2']},
+            {name: 'czd', age: 18, cars: ['car1','car2']},
             {name: 'lq', age: 20, cars: ['car1','car2', 'car3']}
         ];
         $('#tbody1').templateRender({data: userList});
         $('#tbody2').templateRender({data: userList});
         $('#ul1').templateRender({data: userList});
 
-        var user = {name: 'virtuecai', age: 18};
+        var user = {name: 'virtueCai', age: 18};
         $('div.container').templateRender({data: user});
     });
 
