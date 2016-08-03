@@ -2,7 +2,7 @@
  * 版    权:  Tianwen Digital Media Technology(Beijing) Co., Ltd. Copyright YYYY-YYYY,  All rights reserved
  * 描    述:  underscore 模版渲染 辅助|扩展
  * 创 建 人:  Caizhengda
- * 修改时间:  2016-04-15
+ * 修改时间:  2016-08-4
  */
 define('dist/jquery.underscore.render', function (require, exports, module) {
 
@@ -33,15 +33,25 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
         //页面加载初始定义的模版
         $('.underscore-template').each(function () {
             var $this = $(this);
+            var $parent = $this.parent();
+
+            //讲模板内容存放父级data中
             var templateContent;
-            if($this.prop('tagName').toLowerCase() == 'script') {
+            if ($this.prop('tagName').toLowerCase() == 'script') {
                 templateContent = $this.html();
             } else {
                 templateContent = $this.prop('outerHTML');
             }
             //templateContent 内容转义 防止 js 代码中出现 &gt 等等
             templateContent = templateContent.replace(new RegExp("&lt;", "g"), '<').replace(new RegExp("&gt;", "g"), '>');
-            $this.parent().data('template', templateContent);
+            $parent.data('template_content', templateContent);
+
+            //用于模板元素插入位置
+            var $next = $this.next();
+            var $prev = $this.prev();
+            $parent.data('template_$next', $next);
+            $parent.data('template_$prev', $prev);
+
             $this.remove();
         });
 
@@ -82,15 +92,15 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
              * 针对于 data Array, 单个模版 渲染之前
              * @param item Array 中的单个数据, 如果是原始数据类型, 需要转换 {} 对象模版使用
              */
-            itemRenderBeforeCallBack: function (item) {
-                
+            itemRenderBeforeCallback: function (item) {
+
             },
             /**
              * 针对于 data Array, 单个模版 渲染之前
              * @param $item 模版+数据 渲染之后的 jquery 对象(dom)
              */
-            itemRenderAfterCallBack: function ($item) {
-                
+            itemRenderAfterCallback: function ($item) {
+
             }
         };
 
@@ -124,6 +134,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
             },
             render: function (container, options) {
                 var that = this;
+
                 options = $.extend({}, that.options, options);
 
                 options.beforeCallback && options.beforeCallback();
@@ -133,22 +144,10 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                 }
 
                 var $container = $(container);
-                var templateContent = $container.data('template');
+                var templateContent = $container.data('template_content');
                 if (!templateContent) {
-                    var $repeat = $container.find('.underscore-template').first();
-                    if($repeat.prop('tagName').toLowerCase() == 'script') {
-                        templateContent = $repeat.html();
-                    } else {
-                        templateContent = $repeat.prop('outerHTML');
-                    }
+                    throw "该元素下未识别到模板!";
                 }
-                //templateContent 内容转义 防止 js 代码中出现 &gt 等等
-                templateContent = templateContent.replace(new RegExp("&lt;", "g"), '<').replace(new RegExp("&gt;", "g"), '>');
-
-                //检测模版语法
-                that.validateContent(templateContent);
-
-                $container.data('template', templateContent);
 
                 // 需要进行渲染的 data
                 if (jQuery.type(options.data) != "array" && jQuery.type(options.data) != "object") {
@@ -162,44 +161,78 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                     options.emptyDataCallBack && options.emptyDataCallBack($container);
                 }
 
-                var $el = [];
+                var $items = [];
                 // 兼容 对象 or 数据
                 if (jQuery.type(options.data) === "array") {
                     $.each(options.data, function (idx, item) {
                         item.$index = idx;
 
-                        options.itemRenderBeforeCallBack && options.itemRenderBeforeCallBack(item);
+                        options.itemRenderBeforeCallback && options.itemRenderBeforeCallback(item);
 
                         var $item = $(_.template(templateContent)(item)).data('item', item).removeClass('underscore-template').addClass('underscore-template-rendered');
                         that.renderDataSrc($item);
 
-                        options.itemRenderAfterCallBack && options.itemRenderAfterCallBack($item);
+                        options.itemRenderAfterCallback && options.itemRenderAfterCallback($item);
 
-                        $el.push($item);
+                        $items.push($item);
                     });
                 } else if (jQuery.type(options.data) === "object") {
                     var $item = $(_.template(templateContent)(options.data)).data('item', options.data).removeClass('underscore-template').addClass('underscore-template-rendered');
                     that.renderDataSrc($item);
-                    $el.push($item);
+                    $items.push($item);
                 }
-                if(options.autoRemove) {
+                if (options.autoRemove) {
                     $container.find('.underscore-template, .underscore-template-rendered').remove();
                 }
-                try {
-                    $container.append($el);
-                } catch (e) {
-                    // jquery 1.7.2 不支持append jquery 数组 所以得each 一个个append
-                    $.each($el, function (idx, item) {
-                        $container.append(item);
-                    })
-                }
+
+                that.insert($container, $items);
 
                 if (options.enableDefaultImageSrc) {
                     // 当图片url加载时候, 采用默认图片, 需要在图片元素上加上 default-src url;
                     that.loadDefaultImgOnError($container);
                 }
                 //完成后回调
-                options.afterCallback && options.afterCallback($el);
+                options.afterCallback && options.afterCallback($items);
+            },
+            /**
+             * 将生成的模板jquery对象插入, 根据兄弟节点位置, 不存在兄弟节点就直接 append
+             * @param $container
+             * @param $el
+             */
+            insert: function ($container, $items) {
+                var $tempNext = $container.data('template_$next');
+                var $tempPrev = $container.data('template_$prev');
+                var $rendered = $container.find('.underscore-template-rendered');
+                if($rendered.length > 0) {
+                    var $rendered_last = $rendered.last();
+                    $.each($items, function (idx, $item) {
+                        $rendered_last.after($item);
+                        $rendered_last = $item;
+                    });
+                }
+                //如果模板元素存在下一个兄弟节点元素, 则将模板元素插入到之前
+                else if ($tempNext.parent().length > 0) {
+                    $.each($items, function (idx, $item) {
+                        $tempNext.before($item);
+                    });
+                }
+                //如果模板元素存在下一个兄弟节点元素, 则将模板元素插入到之后
+                else if ($tempPrev.parent().length > 0) {
+                    $.each($items, function (idx, $item) {
+                        $tempPrev.after($item);
+                        $tempPrev = $item;
+                    });
+                } else {
+                    //不存在兄弟节点, 直接 append
+                    try {
+                        $container.append($items);
+                    } catch (e) {
+                        // jquery 1.7.2 不支持append jquery 数组 所以得each 一个个append
+                        $.each($items, function (idx, $item) {
+                            $container.append($item);
+                        });
+                    }
+                }
             },
             /**
              * 如果存在 data-src 则将其赋值给 src 属性
@@ -207,7 +240,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
              */
             renderDataSrc: function ($items) {
                 $items.find('img').each(function () {
-                    var $this =$(this);
+                    var $this = $(this);
                     var dataSrc = $this.data('src');
                     if (dataSrc) $this.attr('src', dataSrc);
                     $this.removeAttr('data-src');
@@ -222,8 +255,8 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
          */
         $.fn.templateRender = function (options) {
             return this.each(function () {
-                var $this   = $(this);
-                var data    = $this.data('underscore.render');
+                var $this = $(this);
+                var data = $this.data('underscore.render');
                 var _options = $.extend({}, TemplateRender.defaults, $this.data(), typeof options == 'object' && options)
                 if (!data) {
                     $this.data('underscore.render', (data = new TemplateRender(this, _options)))
@@ -232,6 +265,11 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                 }
             });
         };
+        /**
+         * 用于缩短命名
+         * @type {jQuery.templateRender|*}
+         */
+        $.fn.render = $.fn.templateRender;
 
     })(jQuery);
 

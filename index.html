@@ -16,6 +16,9 @@
 
 <table>
     <tbody id="tbody1">
+        <tr>
+            <td colspan="4">上面啦</td>
+        </tr>
         <script class="underscore-template" type="text/html">
             <tr>
                 <td>{%= $index %}</td>
@@ -26,35 +29,48 @@
                 {% }); %}
             </tr>
         </script>
+        <tr>
+            <td colspan="4">下面啦</td>
+        </tr>
     </tbody>
 </table>
 
 <table>
     <tbody id="tbody2">
+        <tr>
+            <td colspan="4">上面啦</td>
+        </tr>
         <tr class="underscore-template">
             <td>{%= $index %}</td>
             <td>{%= name %}</td>
             <td>{%= age %}</td>
             <td>{%= cars %}</td>
         </tr>
+        <tr>
+            <td colspan="4">下面啦</td>
+        </tr>
     </tbody>
 </table>
 
 <ul id="ul1">
+    <li>上面哦</li>
     <li class="underscore-template">
-        <span>{%= $index %}</span>
         <span>{%= name %}</span>
+        <span>{%= $index %}</span>
         <span>{%= age %}</span>
         {% _.each(cars, function(car , idx, all){ %}
         <span>{%= car %}</span>
         {% }); %}
     </li>
+    <li>下面哦</li>
 </ul>
 
 <div class="container">
+    <h1>上面</h1>
     <h1 class="underscore-template">
         <span>hello, {%= name %}, {%= age %}</span>
     </h1>
+    <h1>下面</h1>
 </div>
 
 <script src="lib/seajs/2.2.3/sea.min.js"></script>
@@ -65,15 +81,29 @@
     });
     seajs.use(['lib/jquery-1.7.2.min', 'lib/underscore.js', 'dist/jquery.underscore.render'], function () {
         var userList = [
-            {name: 'czd', age: 18, cars: ['car1','car2']},
-            {name: 'lq', age: 20, cars: ['car1','car2', 'car3']}
+            {name: 'name1', age: 18, cars: ['car1','car2']},
+            {name: 'name2', age: 20, cars: ['car1','car2', 'car3']}
+        ];
+        var userList2 = [
+            {name: 'name3', age: 18, cars: ['car1','car2']},
+            {name: 'name4', age: 20, cars: ['car1','car2', 'car3']}
         ];
         $('#tbody1').templateRender({data: userList});
         $('#tbody2').templateRender({data: userList});
         $('#ul1').templateRender({data: userList});
+        $('#ul1').templateRender({
+            data: userList2,
+            autoRemove: false,
+            itemRenderBeforeCallback: function (item) {
+                item['$index'] = new Date().getTime();
+            },
+            itemRenderAfterCallback: function ($item) {
+                $item.find('span').eq(2).text("被我改啦..")
+            }
+        });
 
         var user = {name: 'virtueCai', age: 18};
-        $('div.container').templateRender({data: user});
+        $('div.container').render({data: user});
     });
 
 </script>

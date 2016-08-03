@@ -133,9 +133,12 @@ var itemList = [{...},{...},{...}];
 var item = $('tbody tr:fist').data('item');//第一个tr
 // item 数据就是 itemList[0]
 ```
+* 一个元素下仅支持一个标记为 class="underscore-template" 的模板代码
 
 ## 1.1.2 更新
-* options.itemRenderBeforeCallBack(item)
-* options.itemRenderAfterCallBack($item)
+* options.itemRenderBeforeCallback(item);
+* options.itemRenderAfterCallback($item);
+* 增加渲染模板显示位置特性, 渲染出来的数据会插入到模板编写制定位置. 之前版本仅实现了模板父级元素末尾;
+* 增加插件调用方式: $('..').templateRender(..); 和 $('..').render(..); (采纳架构师的强烈要求)
 
 
