@@ -52,20 +52,30 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
         TemplateRender.version = '1.1.2';
 
         TemplateRender.defaults = {
-            //渲染模版的数据, 对象{} 或者 对象数组[{..},{..}]
+            /**
+             * 渲染模版的数据, 对象{} 或者 对象数组[{..},{..}]
+             */
             data: {},
-            // 是否启用默认图片加载, 如果为 true, image 表情语法: <img data-src='' default-src='' />
-            // default-src 为 data-src 加载失败后显示的图片
-            // data-src='' 最终会 set attr src 中
+            /**
+             * 是否启用默认图片加载, 如果为 true, image 表情语法: <img data-src='' default-src='' />
+             * default-src 为 data-src 加载失败后显示的图片
+             *  data-src='' 最终会 set attr src 中
+             *
+             */
             enableDefaultImageSrc: false,
-            //自动移除上一次渲染的元素
+            /**
+             * 自动移除上一次渲染的元素
+             */
             autoRemove: true,
             beforeCallback: function () {
             },
             afterCallback: function () {
             },
-            //检查到传入 data 数据为空时回调
-            emptyDataCallBack: function () {
+            /**
+             * 检查到传入 data 数据为空时回调
+             * @param $container 调用插件的 jquery 对象
+             */
+            emptyDataCallBack: function ($container) {
 
             },
             /**

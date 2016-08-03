@@ -76,12 +76,32 @@ $('div.container').templateRender({data: user});
 
 ```javascript
 options: {
-    data: {} || [], //渲染模版的数据, 对象{} 或者 对象数组[{..},{..}]
-    enableDefaultImageSrc: false, // default-src 为 data-src 加载失败后显示的图片, data-src='' 最终会 set attr src 中
-    autoRemove: true,  //自动移除上一次渲染的元素
-    beforeCallback: function () {}, //渲染前
-    afterCallback: function () {}, //渲染后
-    emptyDataCallBack: function () {}, //检查到传入 data 数据为空时回调
+    /**
+     * 渲染模版的数据, 对象{} 或者 对象数组[{..},{..}]
+     */
+    data: {},
+    /**
+     * 是否启用默认图片加载, 如果为 true, image 表情语法: <img data-src='' default-src='' />
+     * default-src 为 data-src 加载失败后显示的图片
+     *  data-src='' 最终会 set attr src 中
+     *
+     */
+    enableDefaultImageSrc: false,
+    /**
+     * 自动移除上一次渲染的元素
+     */
+    autoRemove: true,
+    beforeCallback: function () {
+    },
+    afterCallback: function () {
+    },
+    /**
+     * 检查到传入 data 数据为空时回调
+     * @param $container 调用插件的 jquery 对象
+     */
+    emptyDataCallBack: function ($container) {
+
+    },
     /**
      * 针对于 data Array, 单个模版 渲染之前
      * @param item Array 中的单个数据, 如果是原始数据类型, 需要转换 {} 对象模版使用
