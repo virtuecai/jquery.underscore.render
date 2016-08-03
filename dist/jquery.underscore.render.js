@@ -49,7 +49,7 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
             this.render(element, options);
         };
 
-        TemplateRender.version = '1.0';
+        TemplateRender.version = '1.1.2';
 
         TemplateRender.defaults = {
             //渲染模版的数据, 对象{} 或者 对象数组[{..},{..}]
@@ -67,6 +67,20 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
             //检查到传入 data 数据为空时回调
             emptyDataCallBack: function () {
 
+            },
+            /**
+             * 针对于 data Array, 单个模版 渲染之前
+             * @param item Array 中的单个数据, 如果是原始数据类型, 需要转换 {} 对象模版使用
+             */
+            itemRenderBeforeCallBack: function (item) {
+                
+            },
+            /**
+             * 针对于 data Array, 单个模版 渲染之前
+             * @param $item 模版+数据 渲染之后的 jquery 对象(dom)
+             */
+            itemRenderAfterCallBack: function ($item) {
+                
             }
         };
 
@@ -143,8 +157,14 @@ define('dist/jquery.underscore.render', function (require, exports, module) {
                 if (jQuery.type(options.data) === "array") {
                     $.each(options.data, function (idx, item) {
                         item.$index = idx;
+
+                        options.itemRenderBeforeCallBack && options.itemRenderBeforeCallBack(item);
+
                         var $item = $(_.template(templateContent)(item)).data('item', item).removeClass('underscore-template').addClass('underscore-template-rendered');
                         that.renderDataSrc($item);
+
+                        options.itemRenderAfterCallBack && options.itemRenderAfterCallBack($item);
+
                         $el.push($item);
                     });
                 } else if (jQuery.type(options.data) === "object") {

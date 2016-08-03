@@ -81,7 +81,21 @@ options: {
     autoRemove: true,  //自动移除上一次渲染的元素
     beforeCallback: function () {}, //渲染前
     afterCallback: function () {}, //渲染后
-    emptyDataCallBack: function () {} //检查到传入 data 数据为空时回调
+    emptyDataCallBack: function () {}, //检查到传入 data 数据为空时回调
+    /**
+     * 针对于 data Array, 单个模版 渲染之前
+     * @param item Array 中的单个数据, 如果是原始数据类型, 需要转换 {} 对象模版使用
+     */
+    itemRenderBeforeCallBack: function (item) {
+
+    },
+    /**
+     * 针对于 data Array, 单个模版 渲染之前
+     * @param $item 模版+数据 渲染之后的 jquery 对象(dom)
+     */
+    itemRenderAfterCallBack: function ($item) {
+
+    }
 }
 ```
 
@@ -92,4 +106,16 @@ options: {
 * Demo 示例, 用的 seajs, 不熟悉移除即可.
 * 可渲染单个/多个数据;
 * 针对于table(强解析)动态td, tr, th 等, 采用`<script>`;
+* 针对于 data 为 Array, 会给每个对象附加一个 $index 属性, 用于模版中使用.
+* 如何获取传递给模版渲染的数据 ? 比如 渲染的是 tbody 中 tr, 请如下示例代码
+```js
+var itemList = [{...},{...},{...}];
+var item = $('tbody tr:fist').data('item');//第一个tr
+// item 数据就是 itemList[0]
+```
+
+## 1.1.2 更新
+* options.itemRenderBeforeCallBack(item)
+* options.itemRenderAfterCallBack($item)
+
 
